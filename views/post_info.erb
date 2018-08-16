@@ -1,0 +1,11 @@
+<h1>Phonebook listings with the updated information:</h1>
+
+<%db_return.each do |item|%>
+<p>
+	<%= item['fname'] %> <%= item['lname'] %>:  <%= item['st_address'] %> <%= item['city'] %>, <%= item['state'] %>, <%= item['zip_code'] %> / Phone Number: <%= item['phonenum'] %> / Email: <%= item['email'] %>
+<% end %>
+</p>
+<form method="post" action='final_result'>
+<h2>Please select "Return" to input another entry:</h3>
+	<input type='submit' value="Return">
+</form>

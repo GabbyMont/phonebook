@@ -1,0 +1,5 @@
+ENV['RDS_HOST'] = 'phonebookappgm.css1roc7lzsp.us-east-1.rds.amazonaws.com'         
+ENV['RDS_PORT'] = '5432'
+ENV['RDS_DB_NAME'] = 'phonebookappgm'
+ENV['RDS_USERNAME'] = 'gabmont296'
+ENV['RDS_PASSWORD'] = 'eaglEs78'

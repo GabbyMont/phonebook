@@ -1,0 +1,23 @@
+<%db_check.each do |item|%>
+	<%= item %><br>
+<% end %>
+
+<form method="post" action="updates">
+	<input type="text" value="<%=db_check[0]%>" name="data[]" placeholder="First Name" required autofocus>
+	<input type="text" value="<%=db_check[1]%>" name="data[]" placeholder="Last Name" required><br>
+	<input type="text" value="<%=db_check[2]%>" name="data[]" placeholder="Street" required>
+	<input type="text" value="<%=db_check[3]%>" name="data[]" placeholder="City" required><br>
+	<input type="text" value="<%=db_check[4]%>" name="data[]" placeholder="State" required>
+	<input type="text" value="<%=db_check[5]%>" name="data[]" placeholder="Zip" minlength="5" maxlength="5" required><br>
+	Continental US Numbers Only<br>
+	<input type="text" value="<%=db_check[6]%>" name="data[]" placeholder="Phone" minlength="10" maxlength="10" required><br>
+	<input type="text" value="<%=db_check[7]%>" name="data[]" placeholder="Email" required><br>
+
+	<h3>Please select the 'update' button to update the given information</h3>
+	<input type="submit" value="Update">
+</form>
+
+<form method="post" action="delete">
+	<h3>Please select "Delete" to delete the existing entry from the phonebook:</h3>
+	<input type="submit" value="Delete">
+</form>
