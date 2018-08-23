@@ -19,19 +19,6 @@ li a {
     text-decoration: none;
 }
 
-
 li a:hover {
     color: purple;
-}
-
-table {
-    font-family: arial, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
-}
-
-td, th {
-    border: 4px solid #dddddd;
-    text-align: left;
-    padding: 8px;
 }

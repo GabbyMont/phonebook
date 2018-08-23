@@ -108,6 +108,10 @@ post '/input_info' do
 	end
 end
 
+post '/final_page' do
+	redirect '/final_result'
+end
+
 get '/updates' do
 	db_check = check_if_user_is_in_db(session[:data]).values[0]
 	erb :update, locals: {db_check: db_check, username: session[:username]}
