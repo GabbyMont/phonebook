@@ -5,21 +5,11 @@ enable :sessions
 
 User = Struct.new(:id, :username, :password_hash)
 USERS = [
-	User.new(1, 'ice', hash_password('cream')),
-	User.new(2, 'brownie', hash_password('bites')),
+	# User.new(1, 'ice', hash_password('cream')),
+	# User.new(2, 'brownie', hash_password('bites')),
 ]
 
 get '/' do
-	# "hello world"
-	erb :enter
-end
-
-post '/enter' do
-	# "you are in post enter"
-	redirect '/sign_in'
-end
-
-get '/sign_in' do
 	puts "in get signin params is #{params}"
 	session[:username] = params[:username]
 	session[:password] = params[:password]
@@ -48,12 +38,12 @@ post '/create_user' do
 	}
 	d_base = PG::Connection.new(db_info)
 	encrypted_pass = BCrypt::Password.create(session[:password], :cost => 11)
-	checkUser = d_base.exec("SELECT username FROM login WHERE username = '#{session[:username]}'")
+	checkUser = d_base.exec("SELECT username FROM login WHERE username = '#{session[:username]}'") 
 	if checkUser.num_tuples.zero? == true
 		puts "checkUser.num_tuples.zero? == true"
 		d_base.exec ("INSERT INTO login (username, password) VALUES ('#{session[:username]}','#{encrypted_pass}')")
 		puts "New row added #{encrypted_pass}"
-		redirect '/sign_in'
+		redirect '/input_info'
 
 	else
 		puts "checkUser.num_tuples.zero? == false"
@@ -67,6 +57,8 @@ post '/sign_in' do
 	puts "in post signin params are #{params}"
 	session[:username] = params[:username]
 	session[:password] = params[:password]
+	p "this is session username #{session[:username]} in sign_in"
+	p "this is session password #{session[:password]} in sign_in"
 	db_info = {
 		host: ENV['RDS_HOST'],
 		port: ENV['RDS_PORT'],
@@ -74,7 +66,7 @@ post '/sign_in' do
 		user: ENV['RDS_USERNAME'],
 		password: ENV['RDS_PASSWORD']
 	}
-	puts "session[:username] is #{session[:username]} and session[:password] is #{session[:password]}"
+	
 	d_base = PG::Connection.new(db_info)
 	user_name = session[:username]
 	user_pass = session[:password]
@@ -91,7 +83,7 @@ post '/sign_in' do
 	if match_login[0]['username'] == user_name &&  comparePassword == user_pass
 		puts "match_login[0]['username'] == user_name &&  comparePassword == user_pass"
 		session[:username] = user_name
-		erb :inputinfo
+		erb :inputinfo, locals: {username: session[:username]}
 	else
 		puts "in the else, doesn't match"
 		erb :login,locals: {message:"invalid username and password combination"}
@@ -100,7 +92,7 @@ post '/sign_in' do
 end
 
 get '/input_info' do
-	erb :inputinfo
+	erb :inputinfo, locals: {username: session[:username]}
 end
 
 post '/input_info' do
@@ -108,7 +100,8 @@ post '/input_info' do
 	db_check = check_if_user_is_in_db(session[:data])
 	if db_check.num_tuples.zero? == true
 		puts "Putting in db b/c information not found"
-		insert_info(session[:data])
+		insert_info(session[:data],session[:username])
+		# puts "i am the db username #{insert_info(session[:data]).values[8]}"
 		redirect '/final_result'
 	else
 		redirect '/updates'
@@ -117,7 +110,7 @@ end
 
 get '/updates' do
 	db_check = check_if_user_is_in_db(session[:data]).values[0]
-	erb :update, locals: {db_check: db_check}
+	erb :update, locals: {db_check: db_check, username: session[:username]}
 end
 
 post '/updates' do
@@ -132,8 +125,8 @@ post '/delete' do
 end
 
 get '/final_result' do
-	db_return = select_from_table()
-	erb :post_info, locals: {db_return: db_return}
+	db_return = select_from_table(session[:username])
+	erb :post_info, locals: {db_return: db_return, username: session[:username]}
 end
 
 post '/final_result' do

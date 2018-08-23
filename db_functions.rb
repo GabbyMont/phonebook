@@ -2,7 +2,7 @@ require 'pg'
 load './local_env.rb' if File.exist?('./local_env.rb')
 
 
-def insert_info(data)
+def insert_info(data,username)
 	begin
 		db_info = {
 			host: ENV['RDS_HOST'],
@@ -13,8 +13,8 @@ def insert_info(data)
 		}
 		d_base = PG::Connection.new(db_info)
 		d_base.exec("INSERT INTO public.user_info
-		(fname, lname, st_address, city, state, zip_code, phonenum, email)
-		VALUES('#{data[0]}','#{data[1]}','#{data[2]}','#{data[3]}','#{data[4]}','#{data[5]}','#{data[6]}','#{data[7]}');");
+		(fname, lname, st_address, city, state, zip_code, phonenum, email, username)
+		VALUES('#{data[0]}','#{data[1]}','#{data[2]}','#{data[3]}','#{data[4]}','#{data[5]}','#{data[6]}','#{data[7]}','#{username}');");
 	rescue PG::Error => e
 		puts e.message
 	ensure
@@ -33,7 +33,7 @@ def update_info(data, olddata)
     }
 	d_base = PG::Connection.new(db_info)
 	d_base.exec ("UPDATE public.user_info
-	SET fname='#{data[0]}', lname='#{data[1]}', st_address='#{data[2]}', city='#{data[3]}', state='#{data[4]}', zip_code='#{data[5]}', phonenum='#{data[6]}', email='#{data[7]}' WHERE email='#{olddata[7]}'");
+	SET fname='#{data[0]}', lname='#{data[1]}', st_address='#{data[2]}', city='#{data[3]}', state='#{data[4]}', zip_code='#{data[5]}', phonenum='#{data[6]}', email='#{data[7]}' WHERE fname='#{data[0]}', lname='#{data[1]}', st_address='#{data[2]}', city='#{data[3]}', state='#{data[4]}', zip_code='#{data[5]}', phonenum='#{data[6]}',email='#{olddata[7]}'");
 	rescue PG::Error => e
 		puts e.message
     ensure
@@ -41,7 +41,7 @@ def update_info(data, olddata)
 	end
 end
 
-def select_from_table()
+def select_from_table(username)
 	begin
 		db_info = {
 			host: ENV['RDS_HOST'],
@@ -51,7 +51,7 @@ def select_from_table()
 			password: ENV['RDS_PASSWORD']
 		}
 		d_base = PG::Connection.new(db_info)
-		list = d_base.exec("SELECT fname,lname,st_address,city,state,zip_code,phonenum,email FROM public.user_info")
+		list = d_base.exec("SELECT fname,lname,st_address,city,state,zip_code,phonenum,email,username FROM public.user_info WHERE username='#{username}'");
 	rescue PG::Error => e
 		puts e.message
 	ensure
@@ -70,8 +70,8 @@ def delete_info(data)
 			password: ENV['RDS_PASSWORD']
 		}
 		d_base = PG::Connection.new(db_info)
-		list = d_base.exec("DELETE FROM public.user_info
-		WHERE fname='#{data[0]}' AND lname='#{data[1]}' AND st_address='#{data[2]}' AND city='#{data[3]}' AND state='#{data[4]}' AND zip_code='#{data[5]}' AND phonenum='#{data[6]}' AND email='#{data[7]}'");           
+		d_base.exec("DELETE FROM public.user_info
+		WHERE fname='#{data[0]}' AND lname='#{data[1]}' AND st_address='#{data[2]}' AND city='#{data[3]}' AND state='#{data[4]}' AND zip_code='#{data[5]}' AND phonenum='#{data[6]}' AND email='#{data[7]}'")       
 	rescue PG::Error => e
 		puts e.message
 	ensure
@@ -96,28 +96,6 @@ def check_if_user_is_in_db(data)
 		d_base.close if d_base
 	end
 end
-
-# def login(username,password)
-# 	begin
-# 		db_info = {
-# 			host: ENV['RDS_HOST'],
-# 			port: ENV['RDS_PORT'],
-# 			dbname: ENV['RDS_DB_NAME'],
-# 			user: ENV['RDS_USERNAME'],
-# 			password: ENV['RDS_PASSWORD']
-# 		}
-# 	end
-# 	db = PG::Connection.new(db_info)
-# 	encrypted_pass = BCrypt::Password.create(password, :cost => 11)
-# 	checkUser = db.exec("SELECT username FROM login WHERE username = '#{username}'")
-# 	if checkUser.num_tuples.zero? == true
-# 		db.exec ("INSERT INTO login (username, password) VALUES ('#{username}','#{encrypted_pass}')")
-# 		puts "New row added #{encrypted_pass}"
-# 	else
-# 		db.close
-# 		puts "Name already exists"
-# 	end
-# end
 
 def update_login_table(data)
 	begin
